@@ -1,11 +1,18 @@
 {
-  "AWSEBDockerrunVersion": "1",
-  "Image": {
-    "Name": "nginx"
-  },
-  "Ports": [
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
     {
-      "ContainerPort": 80
+      "name": "next-docker",
+      "image": "<600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ]
+  
     }
   ]
 }
