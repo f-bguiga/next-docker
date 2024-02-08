@@ -1,38 +1,35 @@
-# Base stage to install node deps
+FROM node:18-alpine as base
+RUN apk add --no-cache g++ make py3-pip libc6-compat
+WORKDIR /app
+COPY package*.json ./
+EXPOSE 3000
 
-FROM --platform=linux/amd64 node:20-alpine AS base
+FROM base as builder
+WORKDIR /app
+COPY . .
+RUN npm run build
+
+
+FROM base as production
 WORKDIR /app
 
-COPY package*.json ./
-
+ENV NODE_ENV=production
 RUN npm ci
 
-# Build stage to transpile `src` into `dist`
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+USER nextjs
 
-FROM base AS build
 
-COPY --from=base package*.json ./
-COPY --from=base /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
+
+CMD npm start
+
+FROM base as dev
+ENV NODE_ENV=development
+RUN npm install 
 COPY . .
-
-RUN npm run build \
-    && npm prune --production
-
-# Final stage for production app image
-
-FROM base AS production
-
-ENV NODE_ENV="production"
-ENV PORT=3000
-
-COPY --from=build --chown=node:node package*.json ./
-COPY --from=build --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/dist ./dist
-
-# Remove if you don't have public files
-COPY --from=build --chown=node:node /app/public ./public
-RUN mkdir -p /app/shared/public
-
-EXPOSE $PORT
-
-CMD ["node", "dist/main.js"]
+CMD npm run dev
