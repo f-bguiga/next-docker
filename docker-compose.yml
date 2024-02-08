@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   api:
-    image: xxxxxxxxxxxx.dkr.ecr.ap-southeast-1.amazonaws.com/crewcall-api-production:${IMAGE_TAG:-latest}
+    image: 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:${IMAGE_TAG:-latest}
     platform: linux/amd64
     restart: always
     ports:
