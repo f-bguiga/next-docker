@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "next-docker",
-      "image": "<600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
+      "image": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
       "essential": true,
       "memory": 128,
       "portMappings": [
