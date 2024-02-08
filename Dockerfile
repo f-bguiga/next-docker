@@ -1,18 +1,38 @@
-FROM node:alpine
+# Base stage to install node deps
 
-# Create app directory
-WORKDIR /usr/src/app
+FROM --platform=linux/amd64 node:20-alpine AS base
+WORKDIR /app
 
-# Install app dependencies
-COPY package.json .
-# For npm@5 or later, copy package-lock.json as well
-# COPY package.json package-lock.json .
+COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
-# Bundle app source
+# Build stage to transpile `src` into `dist`
+
+FROM base AS build
+
+COPY --from=base package*.json ./
+COPY --from=base /app/node_modules ./node_modules
 COPY . .
 
-EXPOSE 8080
+RUN npm run build \
+    && npm prune --production
 
-CMD [ "npm", "start" ]
+# Final stage for production app image
+
+FROM base AS production
+
+ENV NODE_ENV="production"
+ENV PORT=3000
+
+COPY --from=build --chown=node:node package*.json ./
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+
+# Remove if you don't have public files
+COPY --from=build --chown=node:node /app/public ./public
+RUN mkdir -p /app/shared/public
+
+EXPOSE $PORT
+
+CMD ["node", "dist/main.js"]
