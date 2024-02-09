@@ -1,0 +1,18 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+      {
+        "name": "next-docker",
+        "image": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest",
+        "essential": true,
+        "memory": 512,
+        "portMappings": [
+          {
+            "hostPort": 80,
+            "containerPort": 3000
+          }
+        ]
+      }
+    ]
+  }
+  
