@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:20-alpine
+FROM node:14-alpine
 
 # Set the working directory in the container
 WORKDIR /app
@@ -13,11 +13,11 @@ RUN npm install
 # Copy the application files to the working directory
 COPY . .
 
-# Build the Next.js application
+# Build the application
 RUN npm run build
 
-# Expose port 3000 (or the port your Next.js app is configured to run on)
+# Expose the port your app will run on
 EXPOSE 3000
 
-# Define the command to start the Next.js application
+# Define the command to run your application
 CMD ["npm", "start"]
