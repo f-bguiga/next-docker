@@ -1,4 +1,4 @@
-name: Deploy to ECR and Elastic Beanstalk
+name: Build and Push to ECR
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Change this to your main branch name
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,28 +25,10 @@ jobs:
         registry: ${{ secrets.AWS_REGISTRY_URL }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Build and push Docker image to ECR
+    - name: Build and Push Docker image to ECR
       run: |
         docker build -t ${{ secrets.AWS_REGISTRY_URL }}/next-docker:latest .
         docker push ${{ secrets.AWS_REGISTRY_URL }}/next-docker:latest
 
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-
-    # - name: Create Elastic Beanstalk application version
-    #   run: |
-    #     aws elasticbeanstalk create-application-version \
-    #       --application-name your-application-name \
-    #       --version-label your-version-label \
-    #       --source-bundle S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=next-docker-bundle.zip
-
-    # - name: Deploy to Elastic Beanstalk
-    #   run: |
-    #     aws elasticbeanstalk update-environment \
-    #       --application-name your-application-name \
-    #       --environment-name your-environment-name \
-    #       --version-label your-version-label
+    - name: Display ECR Docker image URI
+      run: echo ${{ secrets.AWS_REGISTRY_URL }}/next-docker:latest
