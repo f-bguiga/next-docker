@@ -2,24 +2,24 @@ name: Test & Deploy
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       # Zip Dockerfile for upload
       - name: Generate Deployment Package
         run: zip -r deploy.zip * -x "**node_modules**"
         
       - name: Get timestamp
-        uses: gerred/actions/current-time@master
+        uses: gerred/actions/current-time@main
         id: current-time
 
       - name: Run string replace
-        uses: frabert/replace-string-action@master
+        uses: frabert/replace-string-action@main
         id: format-time
         with:
           pattern: '[:\.]+'
