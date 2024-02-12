@@ -1,19 +1,18 @@
 {
-  "AWSEBDockerrunVersion": "1",
-  "Image": {
-    "Name": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
-    "Update": "true"
-  },
-  "Ports": [
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
     {
-      "ContainerPort": 80
+      "name": "next-docker",
+      "image": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
+      "essential": true,
+      "memory": 512,
+      "cpu": 256,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000
+        }
+      ]
     }
-  ],
-  "Volumes": [
-    {
-      "HostDirectory": "/var/app/current",
-      "ContainerDirectory": "/app"
-    }
-  ],
-  "Logging": "/var/log/nginx"
+  ]
 }
