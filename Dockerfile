@@ -1,23 +1,38 @@
-# Use an official Node.js runtime as a base image
-FROM node:20-alpine
+# Base stage to install node deps
 
-# Set the working directory to /app
+FROM --platform=linux/amd64 node:20-alpine AS base
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the remaining application code to the working directory
+# Build stage to transpile `src` into `dist`
+
+FROM base AS build
+
+COPY --from=base package*.json ./
+COPY --from=base /app/node_modules ./node_modules
 COPY . .
 
-# Build the Next.js application
-RUN npm run build
+RUN npm run build \
+    && npm prune --production
 
-# Expose the port that the application will run on
-EXPOSE 3000
+# Final stage for production app image
 
-# Start the application
-CMD ["npm", "start"]
+FROM base AS production
+
+ENV NODE_ENV="production"
+ENV PORT=3000
+
+COPY --from=build --chown=node:node package*.json ./
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+
+# Remove if you don't have public files
+COPY --from=build --chown=node:node /app/public ./public
+RUN mkdir -p /app/shared/public
+
+EXPOSE $PORT
+
+CMD ["node", "dist/main.js"]
