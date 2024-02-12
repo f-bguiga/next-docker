@@ -1,41 +1,39 @@
-name: Build and Deploy
-
+name: Test & Deploy
 on:
   push:
     branches:
-      - main
-
+      - master
 jobs:
-  build-and-deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: Checkout Latest Repo
+        uses: actions/checkout@master
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Zip Dockerfile for upload
+      - name: Generate Deployment Package
+        run: zip -r deploy.zip * -x "**node_modules**"
+        
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
         with:
-          node-version: 20
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: '-'
+          flags: 'g'
 
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Docker Image
-        run: docker build -t ${{ secrets.AWS_ECR_REGISTRY_URI }}/next-docker:latest .
-
-      - name: Login to AWS ECR
-        run: |
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY_URI }}
-
-      - name: Push Docker Image to ECR
-        run: docker push ${{ secrets.AWS_ECR_REGISTRY_URI }}/next-docker:latest
-
-      # - name: Deploy to Beanstalk using CodePipeline
-      #   run: |
-      #     aws elasticbeanstalk create-application-version --application-name your-application-name \
-      #       --version-label latest --source-bundle S3Bucket=${{ secrets.AWS_S3_BUCKET }},S3Key=latest.zip
-
-      #     aws elasticbeanstalk update-environment --environment-name your-environment-name \
-      #       --version-label latest
-
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: next-docker-test
+          environment_name: Next-docker-test-env
+          version_label: "the-simple-engineer-deployment-${{ steps.format-time.outputs.replaced }}"
+          region: us-east-1
+          deployment_package: deploy.zip
