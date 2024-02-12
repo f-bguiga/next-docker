@@ -23,7 +23,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
       with:
         registry: ${{ secrets.AWS_REGISTRY_URL }}
-        aws-region: us-east-1
+        aws-region: "us-east-1"
 
     - name: Build and Push Docker image to ECR
       run: |
