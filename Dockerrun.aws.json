@@ -1,15 +1,11 @@
 {
-  "AWSEBDockerrunVersion": 2,
-  "containerDefinitions": [
+  "AWSEBDockerrunVersion": 1,
+  "Image": [
     {
-      "name": "nextjs-app",
-      "image": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest",
-      "essential": true,
-      "memory": 512,
-      "portMappings": [
+      "name": "next-docker",
+      "Ports": [
         {
-          "hostPort": 80,
-          "containerPort": 3000
+          "ContainerPort": 8080
         }
       ]
     }
