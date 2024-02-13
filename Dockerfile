@@ -1,38 +1,23 @@
-# Base stage to install node deps
+# Use an official Node.js LTS (Long Term Support) image as the base image
+FROM node:20-alpine
 
-FROM --platform=linux/amd64 node:20-alpine AS base
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-RUN npm ci
+# Install dependencies
+RUN npm install
 
-# Build stage to transpile `src` into `dist`
-
-FROM base AS build
-
-COPY --from=base package*.json ./
-COPY --from=base /app/node_modules ./node_modules
+# Copy the rest of the application code to the working directory
 COPY . .
 
-RUN npm run build \
-    && npm prune --production
+# Build the Next.js app for production
+RUN npm run build
 
-# Final stage for production app image
+# Expose the port that the app will run on
+EXPOSE 3000
 
-FROM base AS production
-
-ENV NODE_ENV="production"
-ENV PORT=3000
-
-COPY --from=build --chown=node:node package*.json ./
-COPY --from=build --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/dist ./dist
-
-# Remove if you don't have public files
-COPY --from=build --chown=node:node /app/public ./public
-RUN mkdir -p /app/shared/public
-
-EXPOSE $PORT
-
-CMD ["node", "dist/main.js"]
+# Start the Next.js app
+CMD ["npm", "start"]
