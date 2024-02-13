@@ -1,4 +1,4 @@
-name: Dockerize and deploy to beanstalk
+name: Deploy dockerized to beanstalk
 on:
   push:
     branches:
@@ -57,8 +57,8 @@ jobs:
         application_name: next-docker-test
         environment_name: Next-docker-test-env
         region: us-east-1
-        version_label: "next-docker-${{ steps.format-time.outputs.replaced }}"
+        version_label: "next-docker-test${{ steps.format-time.outputs.replaced }}"
         deployment_package: deploy.zip
 
     - name: Deployed!
-      run: echo App deployed to ELB
+      run: echo App deployed to beanstalk
