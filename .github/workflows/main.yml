@@ -1,4 +1,4 @@
-name: Dockerize and Deploy to AWS Elastic Beanstalk
+name: Deploy to AWS Elastic Beanstalk
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,15 +24,6 @@ jobs:
       - name: Build Next.js App
         run: npm run build
 
-      - name: Set up Docker
-        uses: docker/setup-docker@v2
-        with:
-          dockerfile: Dockerfile
-          context: .
-
-      - name: Build Docker Image
-        run: docker build -t next-docker .
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -41,15 +32,14 @@ jobs:
           aws-region: 'us-east-1'
 
       - name: Log in to AWS Elastic Beanstalk
-        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 600453241670.dkr.ecr.us-east-1.amazonaws.com
+        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com
 
       - name: Tag Docker Image
-        run: docker tag next-docker:latest 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest
+        run: docker tag your-docker-image-name:latest 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest
 
       - name: Push Docker Image to AWS Elastic Container Registry (ECR)
         run: docker push 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest
 
       - name: Deploy to AWS Elastic Beanstalk
-        run: |
-          eb init -p docker -r us-east-1
-          eb create Next-docker-test-env
+        run: eb deploy
+
