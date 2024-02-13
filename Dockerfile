@@ -1,23 +1,35 @@
-# Use an official Node.js LTS (Long Term Support) image as the base image
-FROM node:20-alpine
+FROM ubuntu:12.04
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
+RUN apt-get update
+RUN apt-get install -y nginx zip curl
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+RUN curl -o /usr/share/nginx/www/master.zip -L https://codeload.github.com/gabrielecirulli/2048/zip/master
+RUN cd /usr/share/nginx/www/ && unzip master.zip && mv 2048-master/* . && rm -rf 2048-master master.zip
 
-# Install dependencies
-RUN npm install
+EXPOSE 80
 
-# Copy the rest of the application code to the working directory
-COPY . .
+CMD ["/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf"]
+# # Use an official Node.js LTS (Long Term Support) image as the base image
+# FROM node:20-alpine
 
-# Build the Next.js app for production
-RUN npm run build
+# # Set the working directory inside the container
+# WORKDIR /usr/src/app
 
-# Expose the port that the app will run on
-EXPOSE 3000
+# # Copy package.json and package-lock.json to the working directory
+# COPY package*.json ./
 
-# Start the Next.js app
-CMD ["npm", "start"]
+# # Install dependencies
+# RUN npm install
+
+# # Copy the rest of the application code to the working directory
+# COPY . .
+
+# # Build the Next.js app for production
+# RUN npm run build
+
+# # Expose the port that the app will run on
+# EXPOSE 3000
+
+# # Start the Next.js app
+# CMD ["npm", "start"]
