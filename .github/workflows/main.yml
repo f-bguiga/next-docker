@@ -1,4 +1,4 @@
-name: Deploy dockerized to beanstalk
+name: Deploy to beanstalk
 on:
   push:
     branches:
