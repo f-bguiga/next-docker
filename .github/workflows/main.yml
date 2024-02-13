@@ -2,7 +2,7 @@ name: Deploy to ECR
 
 # Controls when the workflow will run
 
-on:
+on: push
 
 # Triggers the workflow on push or pull request events but only for the master branch
 
