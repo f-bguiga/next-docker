@@ -34,6 +34,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: next-docker-test
           environment_name: Next-docker-test-env
-          version_label: "the-simple-engineer-deployment-${{ steps.format-time.outputs.replaced }}"
+          version_label: "next-docker-test-${{ steps.format-time.outputs.replaced }}"
           region: us-east-1
           deployment_package: deploy.zip
