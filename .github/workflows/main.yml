@@ -1,30 +1,39 @@
-name: Docker Build and Push to ECR
-
+name: Test & Deploy
 on:
   push:
     branches:
-      - main # Change this to the branch you want to trigger the workflow on
-
+      - master
 jobs:
-  build-and-push:
+  test-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Latest Repo
+        uses: actions/checkout@master
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # Zip Dockerfile for upload
+      - name: Generate Deployment Package
+        run: zip -r deploy.zip * -x "**node_modules**"
+        
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
         with:
-          registry: 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker # Replace with your ECR registry URL
-          region: us-east-1 # Replace with your AWS region
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: '-'
+          flags: 'g'
 
-      - name: Build and push Docker image
-        env:
-          ECR_REGISTRY: 600453241670.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPOSITORY: next-docker # Replace with your ECR repository name
-          TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: next-docker-test
+          environment_name: Next-docker-test-env
+          version_label: "the-simple-engineer-deployment-${{ steps.format-time.outputs.replaced }}"
+          region: us-east-1
+          deployment_package: deploy.zip
