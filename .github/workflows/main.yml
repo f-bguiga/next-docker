@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push Docker image
         run: |
