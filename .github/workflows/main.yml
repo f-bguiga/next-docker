@@ -1,23 +1,26 @@
 name: Deploy to ECR
 
+# Controls when the workflow will run
+
 on:
- 
-  push:
-    branches: [ master ]
+
+# Triggers the workflow on push or pull request events but only for the master branch
+
+#workflow_dispatch
+push:
+branches: [main]
 
 jobs:
-  
-  build:
-    
-    name: Build Image
-    runs-on: ubuntu-latest
 
-   
-    steps:
+build:
+  name: Build Image
+  runs-on: ubuntu-latest
 
+  # Steps represent a sequence of tasks that will be executed as part of the job
+  steps:
     - name: Check out code
       uses: actions/checkout@v2
-    
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
