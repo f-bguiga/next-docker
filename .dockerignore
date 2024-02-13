@@ -10,7 +10,6 @@ docker-compose.yml
 # Ignore node_modules & build files.
 node_modules
 npm-debug.log
-dist
 
 # Ignore test files.
 test
