@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+  build:
+    commands:
+      - docker build -t next-docker:latest .
+      - docker tag next-docker:latest 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest
+  post_build:
+    commands:
+      - docker push 600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest
+artifacts:
+  files: imagedefinitions.json
