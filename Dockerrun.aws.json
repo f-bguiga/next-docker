@@ -1,11 +1,13 @@
 {
-    "AWSEBDockerrunVersion": "1",
-    "Image": {
-      "Name": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:next-docker"
-    },
-    "Ports": [
-      {
-        "ContainerPort": 3000
-      }
-    ]
-  }
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "80",
+      "HostPort": "80"
+    }
+  ]
+}
