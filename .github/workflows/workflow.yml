@@ -1,4 +1,4 @@
-name: Workflow for S3 Deploy
+name: S3 Deploy
 on: [push]
 jobs:
   run:
