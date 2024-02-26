@@ -1,0 +1,33 @@
+# Ignore Node.js modules
+node_modules
+
+# Ignore build artifacts
+.next
+
+# Ignore development-specific files
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore test and documentation files
+*.test.js
+*.spec.js
+coverage
+docs
+
+# Ignore version control files
+.git
+.gitignore
+
+# Ignore Docker-related files
+Dockerfile*
+.dockerignore
+.docker
+
+# Ignore npm debug log
+npm-debug.log*
+
+# Ignore yarn lock files
+yarn.lock
