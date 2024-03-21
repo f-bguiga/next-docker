@@ -7,8 +7,8 @@ on:
     pull_request:
         types: [opened, synchronize, reopened]
   
-  name: SonarQube Scan
-  jobs:
+name: SonarQube Scan
+jobs:
     sonarqube:
       name: SonarQube Trigger
       runs-on: ubuntu-latest
