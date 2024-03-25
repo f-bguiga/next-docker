@@ -29,7 +29,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 
 # Expose the port Next.js is running on
-EXPOSE 3000
+EXPOSE 80
 
 # Start the Next.js application
 CMD ["npm", "start"]
