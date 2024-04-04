@@ -1,7 +1,0 @@
-[
-    {
-      "name": "next-docker",
-      "imageUri": "600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker",
-      "imageTag": "latest"
-    }
-  ]

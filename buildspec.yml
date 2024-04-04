@@ -23,5 +23,10 @@ phases:
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
       - printf '[{"name":next-docker","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - sed -i -e "s|CONTAINER_NAME|$ContainerName|g" imagedefinitions.json
+      - sed -i -e "s|IMAGE_URI|$ImageURI|g" imagedefinitions.json
+      - cat imagedefinitions.json
+
 artifacts:
-    files: imagedefinitions.json
+    files:
+        - imagedefinitions.json
