@@ -1,22 +1,23 @@
-version: 0.2
-
-phases:
-  install:
-    runtime-versions:
-      python: 3.9
+# Don't change this version, this version is buildspec.yml file's versionversion: 0.2phases:
   pre_build:
     commands:
-      - echo Authenticating with Amazon ECR…
-      - aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY_URI
-  build:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=600453241670.dkr.ecr.us-east-1.amazonaws.com/next-docker
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')build:
     commands:
-      - echo Building the Docker image…
-      - docker build -t $PROJECT_NAME .
-      - docker tag $PROJECT_NAME:latest $ECR_REGISTRY_URI/$PROJECT_NAME:latest
-  post_build:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAGpost_build:
     commands:
-      - echo Pushing the Docker image…
-      - docker push $ECR_REGISTRY_URI/$PROJECT_NAME:latest
-artifacts:
-  files:
-    - 'Dockerrun.aws.json'
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"next-docker","imageUri":"%s"}]'    $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.jsonartifacts:
+  files: imagedefinitions.json
